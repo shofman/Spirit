@@ -8,7 +8,8 @@ public class EtherealElem : Elements {
 	protected static EtherealElem _instance;
 
 	private EtherealElem() {
-
+		// Element color inherited from parent Elements
+        this.elementColor = new Color32(255,0,255,255);
 	}
 
 	public static Elements getInstance() {

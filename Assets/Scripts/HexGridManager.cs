@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -18,6 +18,7 @@ public class HexGridManager : MonoBehaviour {
 
     void Awake () {
         gridList = new GameObject[gridHeight, gridLength];
+        hexHashtable = new Hashtable();
     }
 
     // Use this for initialization
@@ -160,5 +161,5 @@ public class HexGridManager : MonoBehaviour {
                 }
             }
         }
-    }
+    }   
 }

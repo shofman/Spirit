@@ -8,7 +8,8 @@ public class FireElem : Elements {
 	protected static FireElem _instance;
 
 	private FireElem() {
-
+		// Element color inherited from parent Elements
+        this.elementColor = new Color32(255,0,0,255);
 	}
 
 	public static Elements getInstance() {

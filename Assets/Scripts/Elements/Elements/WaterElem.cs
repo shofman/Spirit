@@ -8,7 +8,8 @@ public class WaterElem : Elements {
 	protected static WaterElem _instance;
 
 	private WaterElem() {
-
+		// Element color inherited from parent Elements
+        this.elementColor = new Color32(0,0,255,255);
 	}
 
 	public static Elements getInstance() {

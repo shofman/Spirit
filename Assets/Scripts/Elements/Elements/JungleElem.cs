@@ -8,7 +8,8 @@ public class JungleElem : Elements {
 	protected static JungleElem _instance;
 
 	private JungleElem() {
-
+		// Element color inherited from parent Elements
+        this.elementColor = new Color32(0,128,0,255);
 	}
 
 	public static Elements getInstance() {

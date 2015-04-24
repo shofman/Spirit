@@ -8,7 +8,8 @@ public class IceElem : Elements {
 	protected static IceElem _instance;
 
 	private IceElem() {
-
+		// Element color inherited from parent Elements
+        this.elementColor = new Color32(128,128,255,255);
 	}
 
 	public static Elements getInstance() {

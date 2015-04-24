@@ -8,7 +8,8 @@ public class ShadowElem : Elements {
 	protected static ShadowElem _instance;
 
 	private ShadowElem() {
-
+		// Element color inherited from parent Elements
+        this.elementColor = new Color32(0,0,0,255);
 	}
 
 	public static Elements getInstance() {
@@ -35,16 +36,4 @@ public class ShadowElem : Elements {
 	public override bool isStrongAgainst(Elements e) {
 		return _instance.getStrengths().Contains(e);
 	}
-
-	// private ShadowElem() {
-	// 	
-	// 	
-	// }
-
-	// public static Elements getInstance() {
-	// 	if (_instance == null) {
-	// 		_instance = new ShadowElem();
-	// 	}
-	// 	return _instance;
-	// }
 }
