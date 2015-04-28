@@ -35,7 +35,7 @@ public class HexMesh : MonoBehaviour {
         mesh.triangles = newTriangles;
         mesh.RecalculateNormals();
 
-        GetComponent<MeshCollider>().mesh = mesh;
+        GetComponent<MeshCollider>().sharedMesh = mesh;
     }
 
     void Update() {

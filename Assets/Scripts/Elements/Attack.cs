@@ -17,23 +17,8 @@ public class Attack : MonoBehaviour {
 
 
 		bool response = firstType.isWeakAgainst(secondType);
-		Debug.Log("FIRST IS WEAK AGAINST SECOND: " + response);
-		
-		response = secondType.isWeakAgainst(firstType);
-		Debug.Log("SECOND IS WEAK AGAINST FIRST: " + response);
-
-		response = firstType.isWeakAgainst(thirdType);
-		Debug.Log("FIRST IS WEAK AGAINST THIRD: " + response);
-		
-		response = thirdType.isWeakAgainst(firstType);
-		Debug.Log("SECOND IS WEAK AGAINST FIRST: " + response);
-
-		response = thirdType.isWeakAgainst(secondType);
-		Debug.Log("THIRD IS WEAK AGAINST SECOND: " + response);
-		
-		response = secondType.isWeakAgainst(thirdType);
-		Debug.Log("SECOND IS WEAK AGAINST THIRD: " + response);
-
-
+		if (response) {
+			response = thirdType.isWeakAgainst(secondType);
+		}
 	}
 }

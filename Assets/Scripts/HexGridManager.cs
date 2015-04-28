@@ -5,6 +5,9 @@ using System.Collections.Generic;
 public class HexGridManager : MonoBehaviour {
     // The instance of the hexagon that we want to use
     public GameObject hexGridItem;
+
+    // The monster manager within the scene
+    public GameObject monsterManager;
 	
     // Contains all the hexagons on the battlefield
     private GameObject[,] gridList;
@@ -19,34 +22,36 @@ public class HexGridManager : MonoBehaviour {
     void Awake () {
         gridList = new GameObject[gridHeight, gridLength];
         hexHashtable = new Hashtable();
-    }
-
-    // Use this for initialization
-	void Start () {
         GameObject gridHolder = new GameObject();
         gridHolder.transform.parent = this.transform;
         gridHolder.name = "GridHolder";
         createGrid(gridHolder);
     }
+
+    // Use this for initialization
+    void Start () {
+        Mouse.instance().setCurrentState(Mouse.State.Attack);
+    }
 	
 	// Update is called once per frame
 	void Update () {
 	   if (Input.GetMouseButtonDown(0)) {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            // Casts the ray and get the first game object hit
-            if (Physics.Raycast(ray, out hit)) {
-                GameObject hex = hit.collider.transform.gameObject;
-                hex.GetComponent<HexMesh>().debugPos();
+            GameObject clickedObject = Mouse.instance().getClick();
+            if (clickedObject != null && clickedObject.tag == "Hexagon") {
+                // hex.GetComponent<HexMesh>().debugPos();
                 for (int i=0; i<gridList.GetLength(0); i++) {
                     for (int j=0; j<gridList.GetLength(1); j++) {
                         gridList[i,j].GetComponent<HexMesh>().setClicked(false);
                     }
                 }
-                hex.GetComponent<HexMesh>().toggleColor();
+                clickedObject.GetComponent<HexMesh>().toggleColor();
             }
        }
 	}
+
+    public GameObject getRandomTile() {
+        return gridList[0,0];
+    }
 
     /**
      * Creates grid based hex tiles using an axial tiling system

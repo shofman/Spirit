@@ -44,12 +44,27 @@ public class Monster : MonoBehaviour {
      */
     void Update () {
         if (Input.GetMouseButtonDown(0)) {
-            Elements element = getRandomElement();
-            setMaterialColor(element.getColor());
-            Debug.Log(element);
+            GameObject objectClicked = Mouse.instance().getClick();
+            if (objectClicked != null && objectClicked.tag == "Monster") {
+                if (Mouse.instance().getCurrentState() == Mouse.State.Attack &&
+                    objectClicked != gameObject) {
+                    Debug.Log("'We are attacking'");
+                }
+                if (objectClicked == gameObject) {
+                    Mouse.instance().setCurrentState(Mouse.State.Select);
+                }
+            } 
         }
     }
 
+    /**
+     * Sets this monster to be a random element
+     */
+    private void setRandomElement() {
+        Elements element = getRandomElement();
+        setMaterialColor(element.getColor());
+        Debug.Log(element);
+    }
     /**
      * Sets the material color of the hexagon - this has the effect of changing the appearance of the hexagon 
      * @param {[type]} Color c - The color we want the hexagon to appear as (certain values will not appear due to texture used)
