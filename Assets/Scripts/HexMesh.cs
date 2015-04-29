@@ -5,13 +5,6 @@ using System.Collections.Generic;
 
 public class HexMesh : MonoBehaviour, IPointerClickHandler {
     /**
-     * Variables required for rendering the mesh for displaying the hexagon
-     */
-    Vector3[] newVertices;
-    Vector2[] newUV;
-    int[] newTriangles;
-
-    /**
      * The x, y coordinates within an axial coordinate system
      * @see http://www.redblobgames.com/grids/hexagons/
      * @type {Number}
@@ -23,6 +16,13 @@ public class HexMesh : MonoBehaviour, IPointerClickHandler {
      * The gameobject responsible for coordinating the variable hexagons
      */
     GameObject hexManager;
+
+    /**
+     * Variables required for rendering the mesh for displaying the hexagon
+     */
+    Vector3[] newVertices;
+    Vector2[] newUV;
+    int[] newTriangles;
 
     /**
      * Cubic coordinates for this hex within the grid
@@ -125,14 +125,6 @@ public class HexMesh : MonoBehaviour, IPointerClickHandler {
     public void setClicked(bool isClicked) {
         clicked = isClicked;
         toggleColor();
-    }
-
-    /**
-     * Sets the material color of the hexagon - this has the effect of changing the appearance of the hexagon 
-     * @param {[type]} Color c - The color we want the hexagon to appear as (certain values will not appear due to texture used)
-     */
-    private void setMaterialColor(Color c) {
-        gameObject.renderer.material.color = c;
     }
 
     /**
@@ -252,6 +244,14 @@ public class HexMesh : MonoBehaviour, IPointerClickHandler {
      */
     public int getCubeZPos() {
         return this.cubeZPos;
+    }
+
+    /**
+     * Sets the material color of the hexagon - this has the effect of changing the appearance of the hexagon 
+     * @param {[type]} Color c - The color we want the hexagon to appear as (certain values will not appear due to texture used)
+     */
+    private void setMaterialColor(Color c) {
+        gameObject.renderer.material.color = c;
     }
 
     /**

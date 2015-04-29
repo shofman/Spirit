@@ -8,11 +8,6 @@ using System.Collections.Generic;
  */
 public class Mouse {
     /**
-     * The display object on the scene
-     */
-    private GameObject display;
-
-    /**
      * List of states that a mouse can be in
      */
     public enum State {
@@ -20,6 +15,11 @@ public class Mouse {
         Attack,
         Move
     };
+
+    /**
+     * The display object on the scene
+     */
+    private GameObject display;
 
     /**
      * The current state of the mouse
@@ -32,6 +32,13 @@ public class Mouse {
     private static Mouse _instance;
 
     /**
+     * Constructor - set to private to prevent accidental use
+     */
+    private Mouse() {
+        currentState = State.Select;
+    }
+
+    /**
      * Statically access the current mouse state
      * @return Mouse - the current object (if initially null, we create a new Mouse)
      */
@@ -40,13 +47,6 @@ public class Mouse {
             _instance = new Mouse();
         }
         return _instance;
-    }
-
-    /**
-     * Constructor - set to private to prevent accidental use
-     */
-    private Mouse() {
-        currentState = State.Select;
     }
 
     /**
@@ -75,13 +75,6 @@ public class Mouse {
     }
 
     /**
-     * Updates the display for the current state
-     */
-    private void updateDisplay(State state) {
-        display.GetComponent<MouseDisplay>().updateDisplay(state);
-    }
-
-    /**
      * Gets the users mouse click from the position of the camera
      * @return {[type]} GameObject - Returns the gameObject that  was clicked
      *                            or null if nothing was hit
@@ -97,4 +90,10 @@ public class Mouse {
         }
     }
 
+    /**
+     * Updates the display for the current state
+     */
+    private void updateDisplay(State state) {
+        display.GetComponent<MouseDisplay>().updateDisplay(state);
+    }
 }

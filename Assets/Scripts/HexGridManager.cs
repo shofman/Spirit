@@ -44,17 +44,15 @@ public class HexGridManager : MonoBehaviour {
      * @return {[type]}            [description]
      */
     public void notifyOfClick(GameObject hexagon) {
-        // hexagon.GetComponent<HexMesh>().debugPos();
-        toggleAllHexColors(hexagon);
-    }
-
-    private void toggleAllHexColors(GameObject hexToFlip) {
-        for (int i=0; i<gridList.GetLength(0); i++) {
-            for (int j=0; j<gridList.GetLength(1); j++) {
-                gridList[i,j].GetComponent<HexMesh>().setClicked(false);
-            }
+        // Check the mouse state to decide what to do when we've received a click
+        Mouse.State currState = Mouse.instance().getCurrentState();
+        if (currState == Mouse.State.Select) {
+            // If we are still able to select things, select this hexagon
+            selectHexagonAsSelected(hexagon);
+        } else if (currState == Mouse.State.Move) {
+            // We are trying to move a monster here, check with monster manager to see if possible
+            Debug.Log("TRYING TO MOVE");   
         }
-        hexToFlip.GetComponent<HexMesh>().toggleColor();
     }
 
     /**
@@ -63,6 +61,15 @@ public class HexGridManager : MonoBehaviour {
      */
     public GameObject getRandomTile() {
         return gridList[0,0];
+    }
+
+    private void selectHexagonAsSelected(GameObject hexToFlip) {
+        for (int i=0; i<gridList.GetLength(0); i++) {
+            for (int j=0; j<gridList.GetLength(1); j++) {
+                gridList[i,j].GetComponent<HexMesh>().setClicked(false);
+            }
+        }
+        hexToFlip.GetComponent<HexMesh>().toggleColor();
     }
 
     /**
@@ -118,6 +125,8 @@ public class HexGridManager : MonoBehaviour {
             xIndex = storedXValue + 1;
         }
         assignGridNeighbors();
+
+        // Ensure that our hash table is unique
         if (Settings.isErrorCheckerEnabled()) {
             for (int i=0; i<duplicateCheck.Count; i++) {
                 for (int j=0; j<duplicateCheck.Count; j++) {
@@ -130,7 +139,7 @@ public class HexGridManager : MonoBehaviour {
     }
 
     /**
-     * Assigns the neighbors for the 
+     * Assigns the neighbors for the hexagon
      *
      * This will precalculate the positions of the possible neighbors for the particular hex grid item we are on
      * Then it cross references against the available positions of each element stored in the grid. 
