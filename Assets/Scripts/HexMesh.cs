@@ -1,22 +1,55 @@
 using UnityEngine;
-using System.Collections.Generic;
+using UnityEngine.EventSystems;
 using System.Collections;
+using System.Collections.Generic;
 
-public class HexMesh : MonoBehaviour {
+public class HexMesh : MonoBehaviour, IPointerClickHandler {
+    /**
+     * Variables required for rendering the mesh for displaying the hexagon
+     */
     Vector3[] newVertices;
     Vector2[] newUV;
     int[] newTriangles;
 
+    /**
+     * The x, y coordinates within an axial coordinate system
+     * @see http://www.redblobgames.com/grids/hexagons/
+     * @type {Number}
+     */
     public int xPos = 0;
     public int yPos = 0;
 
+    /**
+     * The gameobject responsible for coordinating the variable hexagons
+     */
+    GameObject hexManager;
+
+    /**
+     * Cubic coordinates for this hex within the grid
+     * @type {Number}
+     */
     int cubeXPos = 0;
     int cubeYPos = 0;
     int cubeZPos = 0;
 
+    /**
+     * A list of neighbors beside this hexagon on the grid (everything that touches)
+     * @type {List}
+     */
     private List<GameObject> neighbors;
 
+    /**
+     * Whether or not this object has been clicked/selected
+     * @type {Boolean}
+     */
     private bool clicked = false;
+
+    /**
+     * Whether we are currently right clicking (IPointerClickHandler works for both left
+     * and right clicks, so we limit this to only left clicks)
+     * @type {Boolean}
+     */
+    private bool isRightClicking = false;
 
     void Awake() {
         neighbors = new List<GameObject>();
@@ -27,6 +60,7 @@ public class HexMesh : MonoBehaviour {
     }
 
     void Start() {
+        hexManager = GameObject.Find("GridManager");
         Mesh mesh = new Mesh();
         mesh.name = "Hexagon";
         GetComponent<MeshFilter>().mesh = mesh;
@@ -39,7 +73,21 @@ public class HexMesh : MonoBehaviour {
     }
 
     void Update() {
+        if (Input.GetMouseButtonDown(1)) {
+            isRightClicking = true;
+        } else if (Input.GetMouseButtonUp(1)) {
+            isRightClicking = false;
+        }
+    }
 
+    /**
+     * Detects mouse clicks, but only if a UI element does not interfere with the click
+     * @param eventData - Information about the event that we don't really care currently about
+     */
+    public void OnPointerClick(PointerEventData eventData) {
+        if (!isRightClicking) {
+            hexManager.GetComponent<HexGridManager>().notifyOfClick(gameObject);
+        }
     }
 
     /**

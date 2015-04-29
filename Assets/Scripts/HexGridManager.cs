@@ -35,20 +35,32 @@ public class HexGridManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-	   if (Input.GetMouseButtonDown(0)) {
-            GameObject clickedObject = Mouse.instance().getClick();
-            if (clickedObject != null && clickedObject.tag == "Hexagon") {
-                // hex.GetComponent<HexMesh>().debugPos();
-                for (int i=0; i<gridList.GetLength(0); i++) {
-                    for (int j=0; j<gridList.GetLength(1); j++) {
-                        gridList[i,j].GetComponent<HexMesh>().setClicked(false);
-                    }
-                }
-                clickedObject.GetComponent<HexMesh>().toggleColor();
-            }
-       }
+
 	}
 
+    /**
+     * Receives a notification of a click from a hexagon and performs an action
+     * @param  {[type]} GameObject hexagon       [description]
+     * @return {[type]}            [description]
+     */
+    public void notifyOfClick(GameObject hexagon) {
+        // hexagon.GetComponent<HexMesh>().debugPos();
+        toggleAllHexColors(hexagon);
+    }
+
+    private void toggleAllHexColors(GameObject hexToFlip) {
+        for (int i=0; i<gridList.GetLength(0); i++) {
+            for (int j=0; j<gridList.GetLength(1); j++) {
+                gridList[i,j].GetComponent<HexMesh>().setClicked(false);
+            }
+        }
+        hexToFlip.GetComponent<HexMesh>().toggleColor();
+    }
+
+    /**
+     * Returns a random tile
+     * @return {[type]} GameObject - A hexagon grid object found at random
+     */
     public GameObject getRandomTile() {
         return gridList[0,0];
     }
@@ -76,7 +88,10 @@ public class HexGridManager : MonoBehaviour {
                 GameObject hexagonCreated = (GameObject)Instantiate(hexGridItem);
                 hexagonCreated.transform.parent = gridHolder.transform;
                 float jPosition = i%2 + j*2;
-                hexagonCreated.transform.position = new Vector3(jPosition,0,i*-1.5f);
+                float iPosition = i * -1.5f;
+                // Scale the positions of hexagon by the size of the object
+                Vector3 hexScale = hexagonCreated.transform.localScale;
+                hexagonCreated.transform.position = new Vector3(jPosition*hexScale[0],0,iPosition*hexScale[2]);
 
                 // Store the object in the array
                 gridList[i,j] = hexagonCreated;

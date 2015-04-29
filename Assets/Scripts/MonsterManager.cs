@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -8,8 +9,15 @@ public class MonsterManager : MonoBehaviour {
      */
     public GameObject monster;
 
-    // The hex grid manager within the scene
+    /**
+     * The hex grid manager within the scene
+     */
     public GameObject hexGridManager;
+
+    /**
+     * The Monster display 
+     */
+    public GameObject monsterDisplay;
 
     /**
      * Called when the script is being loaded 
@@ -35,5 +43,13 @@ public class MonsterManager : MonoBehaviour {
      */
     void Update () {
 
-    }   
+    }
+
+    /**
+     * TODO - MAKE INTO AN INTERFACE FOR A MANAGER CLASS
+     * Receives a notification of a click event that happened from one of the monsters
+     */
+    public void notifyOfClick(GameObject monster) {
+        monsterDisplay.GetComponent<MonsterActionDisplay>().moveToGameObject(monster);
+    }
 }

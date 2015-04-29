@@ -1,13 +1,18 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 using System.Collections;
 using System.Collections.Generic;
 
-public class Monster : MonoBehaviour {
+public class Monster : MonoBehaviour, IPointerClickHandler {
     // Random number generation (DO NOT INSTANTIATE MULTIPLE TIMES FOR BETTER RANDOMNESS)
     System.Random random;
 
     // A list of all possible elements
     List<Elements> allElements;
+
+    GameObject monsterManager;
+
+    bool isRightClicking = false;
     
     /**
      * Called when the script is being loaded 
@@ -36,7 +41,17 @@ public class Monster : MonoBehaviour {
      * Called when the script is first enabled (will not be run until an object is enabled)
      */
     void Start () {
+        monsterManager = GameObject.Find("MonsterManager");
+    }
 
+    /**
+     * Detects mouse clicks, but only if a UI element does not interfere with the click
+     * @param eventData - Information about the event that we don't really care currently about
+     */
+    public void OnPointerClick(PointerEventData eventData) {
+        if (!isRightClicking) {
+            monsterManager.GetComponent<MonsterManager>().notifyOfClick(gameObject);
+        }
     }
 
     /**
@@ -54,6 +69,11 @@ public class Monster : MonoBehaviour {
                     Mouse.instance().setCurrentState(Mouse.State.Select);
                 }
             } 
+        } else if (Input.GetMouseButtonDown(1)) {
+            isRightClicking = true;
+        } else if (Input.GetMouseButtonUp(1)) {
+            isRightClicking = false;
+            Mouse.instance().setCurrentState(Mouse.State.Select);
         }
     }
 
