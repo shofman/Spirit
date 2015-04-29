@@ -25,6 +25,31 @@ public class Monster : MonoBehaviour, IPointerClickHandler {
      * @type {Boolean}
      */
     bool isRightClicking = false;
+
+    /**
+     * TODO - MOVE MOVEMENT CODE INTO SEPARATE FILE
+     */
+    /**
+     * Whether or not the monster is currently moving
+     * @type {Boolean}
+     */
+    bool isMoving = false;
+
+    /**
+     * The location where we want to move
+     * @type {Vector3}
+     */
+    private Vector3 targetMovementPos;
+
+    /**
+     * How far a monster is allowed to move
+     */
+    protected int movementAmount;
+
+    /**
+     * How fast the monster when it does move
+     */
+    float speed;
     
     /**
      * Called when the script is being loaded 
@@ -42,6 +67,8 @@ public class Monster : MonoBehaviour, IPointerClickHandler {
             WaterElem.getInstance()
         };
         random = new System.Random();
+        movementAmount = 100;
+        speed = 10;
     }
 
     /**
@@ -57,22 +84,44 @@ public class Monster : MonoBehaviour, IPointerClickHandler {
      */
     void Update () {
         if (Input.GetMouseButtonDown(0)) {
-            GameObject objectClicked = Mouse.instance().getClick();
-            if (objectClicked != null && objectClicked.tag == "Monster") {
-                if (Mouse.instance().getCurrentState() == Mouse.State.Attack &&
-                    objectClicked != gameObject) {
-                    Debug.Log("'We are attacking'");
-                }
-                if (objectClicked == gameObject) {
-                    Mouse.instance().setCurrentState(Mouse.State.Select);
-                }
-            } 
+            // GameObject objectClicked = Mouse.instance().getClick();
+            // if (objectClicked != null && objectClicked.tag == "Monster") {
+            //     if (Mouse.instance().getCurrentState() == Mouse.State.Attack &&
+            //         objectClicked != gameObject) {
+            //         Debug.Log("'We are attacking'");
+            //     }
+            //     if (objectClicked == gameObject) {
+            //         Mouse.instance().setCurrentState(Mouse.State.Select);
+            //     }
+            // } 
         } else if (Input.GetMouseButtonDown(1)) {
             isRightClicking = true;
         } else if (Input.GetMouseButtonUp(1)) {
             isRightClicking = false;
             Mouse.instance().setCurrentState(Mouse.State.Select);
         }
+
+        if (isMoving) {
+            moveTo(targetMovementPos);
+            if (transform.position == targetMovementPos) {
+                isMoving = false;
+                Debug.Log("REACHED POSITION");
+            }
+        }
+    }
+
+    /**
+     * Moves the monster to a location defined by the Vector3
+     * @param  {[type]} Vector3 positionToMoveTo - Where we want to move the monster to
+     *                                             We only use the x and z coordinates here
+     */
+    public void moveTo(Vector3 position) {
+        if (!isMoving) {
+            isMoving = true;
+            targetMovementPos = position;
+        }
+        float step = speed * Time.deltaTime;
+        transform.position = Vector3.MoveTowards(transform.position, position, step);
     }
 
     /**
@@ -83,6 +132,14 @@ public class Monster : MonoBehaviour, IPointerClickHandler {
         if (!isRightClicking) {
             monsterManager.GetComponent<MonsterManager>().notifyOfClick(gameObject);
         }
+    }
+
+    /**
+     * Returns the movement amount for this monster
+     * @return int - The amount of spaces this monster can move
+     */
+    public int getMovementAmount() {
+        return movementAmount;
     }
 
     /**

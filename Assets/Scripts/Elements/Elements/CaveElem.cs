@@ -9,7 +9,7 @@ public class CaveElem : Elements {
 
 	private CaveElem() {
 		// Element color inherited from parent Elements
-        this.elementColor = new Color32(50,50,50,255);
+        this.elementColor = new Color32(128,128,128,255);
 	}
 
 	public static Elements getInstance() {

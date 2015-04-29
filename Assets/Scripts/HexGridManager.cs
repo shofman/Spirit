@@ -30,7 +30,7 @@ public class HexGridManager : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        Mouse.instance().setCurrentState(Mouse.State.Attack);
+        Mouse.instance().setCurrentState(Mouse.State.Select);
     }
 	
 	// Update is called once per frame
@@ -46,12 +46,21 @@ public class HexGridManager : MonoBehaviour {
     public void notifyOfClick(GameObject hexagon) {
         // Check the mouse state to decide what to do when we've received a click
         Mouse.State currState = Mouse.instance().getCurrentState();
-        if (currState == Mouse.State.Select) {
-            // If we are still able to select things, select this hexagon
-            selectHexagonAsSelected(hexagon);
-        } else if (currState == Mouse.State.Move) {
-            // We are trying to move a monster here, check with monster manager to see if possible
-            Debug.Log("TRYING TO MOVE");   
+        switch (currState) {
+            case Mouse.State.Select:
+                // If we are still able to select things, select this hexagon
+                selectHexagonAsSelected(hexagon);
+                break;
+            case Mouse.State.Move:
+                // We are trying to move a monster here, check with monster manager to see if possible
+                GameObject monster = monsterManager.GetComponent<MonsterManager>().getSelectedMonster();
+                if (monster != null) {
+                    if (isMovementPossible(monster, hexagon)) {
+                        monster.GetComponent<Monster>().moveTo(hexagon.transform.position);
+                    }
+                }
+                Mouse.instance().setCurrentState(Mouse.State.Select);
+                break;
         }
     }
 
@@ -63,6 +72,20 @@ public class HexGridManager : MonoBehaviour {
         return gridList[0,0];
     }
 
+    /**
+     * Returns whether the movement is possible between a monster and a tile
+     * @param  {[type]}  GameObject monster - The monster that we want to try moving
+     * @param  {[type]}  GameObject tile - The tile we want to move towards
+     * @return {Boolean} - Whether or not the monster can move to the tile
+     */
+    private bool isMovementPossible(GameObject monster, GameObject tile) {
+        return true;
+    }
+
+    /**
+     * Sets the hexagon as a selected value
+     * @param  {[type]} GameObject hexToFlip - The hexagon we want to indicate that has been selected
+     */
     private void selectHexagonAsSelected(GameObject hexToFlip) {
         for (int i=0; i<gridList.GetLength(0); i++) {
             for (int j=0; j<gridList.GetLength(1); j++) {

@@ -9,7 +9,7 @@ public class ShadowElem : Elements {
 
 	private ShadowElem() {
 		// Element color inherited from parent Elements
-        this.elementColor = new Color32(0,0,0,255);
+        this.elementColor = new Color32(26,26,26,255);
 	}
 
 	public static Elements getInstance() {
