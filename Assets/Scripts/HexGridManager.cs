@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
+using System;
 
 public class HexGridManager : MonoBehaviour {
     // The instance of the hexagon that we want to use
@@ -12,6 +13,11 @@ public class HexGridManager : MonoBehaviour {
     // Contains all the hexagons on the battlefield
     private GameObject[,] gridList;
     private Hashtable hexHashtable;
+
+    /**
+     * Contains the selected grid element
+     */
+    private GameObject selectedHexagon;
 
     /**
      * Dimensions of the grid
@@ -35,7 +41,9 @@ public class HexGridManager : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-
+        if (Mouse.instance().getCurrentState() == Mouse.State.Move) {
+            // monsterManager.getSelectedMonster()
+        }
 	}
 
     /**
@@ -49,14 +57,29 @@ public class HexGridManager : MonoBehaviour {
         switch (currState) {
             case Mouse.State.Select:
                 // If we are still able to select things, select this hexagon
+                GameObject prevSelectedHexagon = selectedHexagon;
                 selectHexagonAsSelected(hexagon);
+                if (prevSelectedHexagon != null) {
+                    int distance = calculateCubeDistance(prevSelectedHexagon, selectedHexagon);
+                    // Debug.Log(distance);
+                }
                 break;
             case Mouse.State.Move:
                 // We are trying to move a monster here, check with monster manager to see if possible
                 GameObject monster = monsterManager.GetComponent<MonsterManager>().getSelectedMonster();
                 if (monster != null) {
                     if (isMovementPossible(monster, hexagon)) {
-                        monster.GetComponent<Monster>().moveTo(hexagon.transform.position);
+                        Monster monsterScript = monster.GetComponent<Monster>();
+
+                        // Get the previous position so we can set it to null
+                        GameObject monsterPrevPositionHexagon = monsterScript.getTilePosition();
+                        
+                        // Move the monster to the hexagon
+                        monsterScript.moveTo(hexagon);
+
+                        // Update the hexagons to reflect movement
+                        hexagon.GetComponent<HexMesh>().setAssociatedMonster(monster);
+                        monsterPrevPositionHexagon.GetComponent<HexMesh>().setAssociatedMonster(null);
                     }
                 }
                 Mouse.instance().setCurrentState(Mouse.State.Select);
@@ -69,7 +92,23 @@ public class HexGridManager : MonoBehaviour {
      * @return {[type]} GameObject - A hexagon grid object found at random
      */
     public GameObject getRandomTile() {
-        return gridList[0,0];
+        int values = gridList.GetLength(0) * gridList.GetLength(1);
+        int index = RandomGenerator.instance().getRandomNumber(values);
+        return gridList[index % gridList.GetLength(0), index / gridList.GetLength(0)];
+    }
+
+    /**
+     * Calculate the distance between two hexagons positions
+     * @return {[int]} - The distance between two hexes
+     */
+    public int calculateCubeDistance(GameObject hexagonOne, GameObject hexagonTwo) {
+        HexMesh hexOne = hexagonOne.GetComponent<HexMesh>();
+        HexMesh hexTwo = hexagonTwo.GetComponent<HexMesh>();
+        int xDifference = Math.Abs(hexOne.getCubeXPos() - hexTwo.getCubeXPos());
+        int yDifference = Math.Abs(hexOne.getCubeYPos() - hexTwo.getCubeYPos());
+        int zDifference = Math.Abs(hexOne.getCubeZPos() - hexTwo.getCubeZPos());
+
+        return Math.Max(zDifference, Math.Max(xDifference, yDifference));
     }
 
     /**
@@ -87,12 +126,35 @@ public class HexGridManager : MonoBehaviour {
      * @param  {[type]} GameObject hexToFlip - The hexagon we want to indicate that has been selected
      */
     private void selectHexagonAsSelected(GameObject hexToFlip) {
+        clearGridClicks();
+        hexToFlip.GetComponent<HexMesh>().toggleColor();
+        selectedHexagon = hexToFlip;
+    }
+
+    /**
+     * Colors all of the hexagons within a particular range
+     * @param  {[type]} GameObject hexagon - The starting position for the coloration
+     * @param  {[type]} int        range   - The distance we want to color
+     */
+    private void colorHexagonsWithinRange(GameObject hexagon, int range) {
+        clearGridClicks();
+
         for (int i=0; i<gridList.GetLength(0); i++) {
             for (int j=0; j<gridList.GetLength(1); j++) {
                 gridList[i,j].GetComponent<HexMesh>().setClicked(false);
             }
         }
-        hexToFlip.GetComponent<HexMesh>().toggleColor();
+    }
+
+    /**
+     * Resets the entire gameboard to be unclicked
+     */
+    private void clearGridClicks() {
+        for (int i=0; i<gridList.GetLength(0); i++) {
+            for (int j=0; j<gridList.GetLength(1); j++) {
+                gridList[i,j].GetComponent<HexMesh>().setClicked(false);
+            }
+        }
     }
 
     /**

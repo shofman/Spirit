@@ -4,8 +4,6 @@ using System.Collections;
 using System.Collections.Generic;
 
 public class Monster : MonoBehaviour, IPointerClickHandler {
-    // Random number generation (DO NOT INSTANTIATE MULTIPLE TIMES FOR BETTER RANDOMNESS)
-    System.Random random;
 
     // A list of all possible elements
     List<Elements> allElements;
@@ -37,9 +35,14 @@ public class Monster : MonoBehaviour, IPointerClickHandler {
 
     /**
      * The location where we want to move
-     * @type {Vector3}
+     * @type {GameObject}
      */
-    private Vector3 targetMovementPos;
+    private GameObject targetMovementHexagon;
+
+    /**
+     * The hexagon game object the monster is currently on
+     */
+    private GameObject tilePosition;
 
     /**
      * How far a monster is allowed to move
@@ -66,8 +69,8 @@ public class Monster : MonoBehaviour, IPointerClickHandler {
             ShadowElem.getInstance(),
             WaterElem.getInstance()
         };
-        random = new System.Random();
-        movementAmount = 100;
+        
+        movementAmount = 5;
         speed = 10;
     }
 
@@ -102,8 +105,8 @@ public class Monster : MonoBehaviour, IPointerClickHandler {
         }
 
         if (isMoving) {
-            moveTo(targetMovementPos);
-            if (transform.position == targetMovementPos) {
+            moveTo(targetMovementHexagon);
+            if (transform.position == targetMovementHexagon.transform.position) {
                 isMoving = false;
                 Debug.Log("REACHED POSITION");
             }
@@ -115,13 +118,15 @@ public class Monster : MonoBehaviour, IPointerClickHandler {
      * @param  {[type]} Vector3 positionToMoveTo - Where we want to move the monster to
      *                                             We only use the x and z coordinates here
      */
-    public void moveTo(Vector3 position) {
+    public void moveTo(GameObject hexagon) {
+        Vector3 position = hexagon.transform.position;
         if (!isMoving) {
             isMoving = true;
-            targetMovementPos = position;
+            targetMovementHexagon = hexagon;
         }
         float step = speed * Time.deltaTime;
         transform.position = Vector3.MoveTowards(transform.position, position, step);
+        setTilePosition(hexagon);
     }
 
     /**
@@ -143,10 +148,25 @@ public class Monster : MonoBehaviour, IPointerClickHandler {
     }
 
     /**
+     * Sets the position of the monster
+     */
+    public void setTilePosition(GameObject hexagon) {
+        this.tilePosition = hexagon;
+    }
+
+    /**
+     * Returns the hexagon object where the monster currently is (or is moving to)
+     */
+    public GameObject getTilePosition() {
+        return this.tilePosition;
+    }
+
+    /**
      * Gets a random element for use
      */
     private Elements getRandomElement() {
-        int index = random.Next(allElements.Count);
+        int index = RandomGenerator.instance().getRandomNumber(allElements.Count);
+        Debug.Log(index);
         return allElements[index];
     }
 

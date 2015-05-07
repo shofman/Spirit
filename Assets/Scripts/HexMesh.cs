@@ -45,6 +45,11 @@ public class HexMesh : MonoBehaviour, IPointerClickHandler {
     private bool clicked = false;
 
     /**
+     * The monster that is currently attached to this tile (null if no monster)
+     */
+    private GameObject monster;
+
+    /**
      * Whether we are currently right clicking (IPointerClickHandler works for both left
      * and right clicks, so we limit this to only left clicks)
      * @type {Boolean}
@@ -61,15 +66,8 @@ public class HexMesh : MonoBehaviour, IPointerClickHandler {
 
     void Start() {
         hexManager = GameObject.Find("GridManager");
-        Mesh mesh = new Mesh();
-        mesh.name = "Hexagon";
-        GetComponent<MeshFilter>().mesh = mesh;
-        mesh.vertices = newVertices;
-        mesh.uv = newUV;
-        mesh.triangles = newTriangles;
-        mesh.RecalculateNormals();
-
-        GetComponent<MeshCollider>().sharedMesh = mesh;
+        setupMesh();
+        setAssociatedMonster(null);
     }
 
     void Update() {
@@ -247,12 +245,51 @@ public class HexMesh : MonoBehaviour, IPointerClickHandler {
     }
 
     /**
+     * Returns whether there's a monster associated with this tile
+     * @return {[bool]}
+     */
+    public bool hasMonster() {
+        return this.monster != null;
+    }
+
+    /**
+     * Sets the monster for this tile (can be null)
+     * @param {[type]} GameObject monster - the monster we want to associate with this tile
+     */
+    public void setAssociatedMonster(GameObject newMonster) {
+        this.monster = newMonster;
+    }
+
+    /**
+     * Returns the monster associated with this tile
+     * @return {[type]} GameObject - The monster we have with the tile (can be null)
+     */
+    public GameObject getAssociatedMonster() {
+        return this.monster;
+    }
+
+    /**
      * Sets the material color of the hexagon - this has the effect of changing the appearance of the hexagon 
      * @param {[type]} Color c - The color we want the hexagon to appear as (certain values will not appear due to texture used)
      */
     private void setMaterialColor(Color c) {
         gameObject.renderer.material.color = c;
     }
+
+    /**
+     * Sets up the mesh for the hexagon
+     */
+     private void setupMesh() {
+        Mesh mesh = new Mesh();
+        mesh.name = "Hexagon";
+        GetComponent<MeshFilter>().mesh = mesh;
+        mesh.vertices = newVertices;
+        mesh.uv = newUV;
+        mesh.triangles = newTriangles;
+        mesh.RecalculateNormals();
+
+        GetComponent<MeshCollider>().sharedMesh = mesh;
+     }
 
     /**
      * Creates the vertices on the mesh object

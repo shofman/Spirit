@@ -35,10 +35,12 @@ public class MonsterManager : MonoBehaviour {
      * Called when the script is first enabled (will not be run until an object is enabled)
      */
     void Start () {
-        GameObject monsterCreated = (GameObject)Instantiate(monsterTemplate);
-        monsterCreated.name = "TIM";
-        // Get a random starting position
-        GameObject randomTile = hexGridManager.GetComponent<HexGridManager>().getRandomTile();
+        for (int i=0; i<56; i++) {
+            spawnMonster("RANDOM"+i);
+        }
+        // spawnMonster("Tim");
+        // spawnMonster("George");
+        // spawnMonster("BOB");
 
         // monsterCreated.transform.position = 
     }
@@ -47,7 +49,9 @@ public class MonsterManager : MonoBehaviour {
      * Called once per frame
      */
     void Update () {
-
+        if (Input.GetKeyDown("4")) {
+            // randomTile.GetComponent<HexMesh>().setClicked(true);
+        }
     }
 
     public GameObject getSelectedMonster() {
@@ -78,5 +82,25 @@ public class MonsterManager : MonoBehaviour {
                 Debug.Log("CANNOT MOVE TO THIS POSITION");
                 break;
         }
+    }
+
+    /**
+     * Creates a monster on the field at random (as long as there isn't another monster already on the field)
+     * @param  {[type]} string name The name of the monster
+     */
+    private void spawnMonster(string name) {
+        GameObject monsterCreated = (GameObject)Instantiate(monsterTemplate);
+        GameObject randomTile = null;
+        while (randomTile == null) {
+            randomTile = hexGridManager.GetComponent<HexGridManager>().getRandomTile();
+            if (randomTile.GetComponent<HexMesh>().hasMonster()) {
+                randomTile = null;
+            } else {
+                randomTile.GetComponent<HexMesh>().setAssociatedMonster(monsterCreated);
+                monsterCreated.GetComponent<Monster>().setTilePosition(randomTile);
+                monsterCreated.transform.position = randomTile.transform.position;
+            }
+        }
+        monsterCreated.name = name;
     }
 }
