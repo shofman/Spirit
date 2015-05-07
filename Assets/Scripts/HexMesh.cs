@@ -62,12 +62,12 @@ public class HexMesh : MonoBehaviour, IPointerClickHandler {
         setupUV();
         setupTriangles();
         setupNormals();
+        setAssociatedMonster(null);
     }
 
     void Start() {
         hexManager = GameObject.Find("GridManager");
         setupMesh();
-        setAssociatedMonster(null);
     }
 
     void Update() {
@@ -108,13 +108,21 @@ public class HexMesh : MonoBehaviour, IPointerClickHandler {
      * Toggles the color of the current hexagon
      */
     public void toggleColor() {
+        toggleColor(Color.red);
+    }
+
+    /**
+     * Toggles the color of the current hexagon
+     * @param {[type]} Color c - The color we want to set the hexagon
+     */
+    public void toggleColor(Color c) {
         if (clicked) {
-            setMaterialColor(Color.red);
+            setMaterialColor(c);
         } else {
             setMaterialColor(Color.white);
         }
         clicked = !clicked;
-    }
+    } 
 
     /**
      * Sets whether this particular hexagon has been clicked

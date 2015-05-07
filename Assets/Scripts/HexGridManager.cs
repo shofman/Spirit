@@ -20,6 +20,11 @@ public class HexGridManager : MonoBehaviour {
     private GameObject selectedHexagon;
 
     /**
+     * Boolean for whether or not we should display the movement color
+     */
+    private bool showMovementColoring = false;
+
+    /**
      * Dimensions of the grid
      */ 
     private int gridLength = 8;
@@ -42,7 +47,15 @@ public class HexGridManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         if (Mouse.instance().getCurrentState() == Mouse.State.Move) {
-            // monsterManager.getSelectedMonster()
+            showMovementColoring = true;
+            GameObject currentMonster = monsterManager.GetComponent<MonsterManager>().getSelectedMonster();
+            GameObject monstersHexagon = currentMonster.GetComponent<Monster>().getTilePosition();
+            colorHexagonsWithinRange(monstersHexagon, currentMonster.GetComponent<Monster>().getMovementAmount());
+        } else {
+            if (showMovementColoring) {
+                showMovementColoring = false;
+                clearGridClicks();
+            }
         }
 	}
 
@@ -61,7 +74,6 @@ public class HexGridManager : MonoBehaviour {
                 selectHexagonAsSelected(hexagon);
                 if (prevSelectedHexagon != null) {
                     int distance = calculateCubeDistance(prevSelectedHexagon, selectedHexagon);
-                    // Debug.Log(distance);
                 }
                 break;
             case Mouse.State.Move:
@@ -114,11 +126,22 @@ public class HexGridManager : MonoBehaviour {
     /**
      * Returns whether the movement is possible between a monster and a tile
      * @param  {[type]}  GameObject monster - The monster that we want to try moving
-     * @param  {[type]}  GameObject tile - The tile we want to move towards
+     * @param  {[type]}  GameObject tileToMoveTo - The tile we want to move towards
      * @return {Boolean} - Whether or not the monster can move to the tile
      */
-    private bool isMovementPossible(GameObject monster, GameObject tile) {
-        return true;
+    private bool isMovementPossible(GameObject monster, GameObject tileToMoveTo) {
+        Monster monsterScript = monster.GetComponent<Monster>();
+        GameObject monsterTile = monsterScript.getTilePosition();
+        int distanceBetweenTiles = calculateCubeDistance(monsterTile, tileToMoveTo);
+        bool isWithinDistance = monsterScript.getMovementAmount() >= distanceBetweenTiles;
+        Debug.Log(distanceBetweenTiles);
+        Debug.Log(isWithinDistance);
+        if (!tileToMoveTo.GetComponent<HexMesh>().hasMonster() && isWithinDistance) {
+            return true;
+        } else {
+            Debug.Log("CANNOT MOVE");
+            return false;
+        }
     }
 
     /**
@@ -137,11 +160,18 @@ public class HexGridManager : MonoBehaviour {
      * @param  {[type]} int        range   - The distance we want to color
      */
     private void colorHexagonsWithinRange(GameObject hexagon, int range) {
-        clearGridClicks();
+        if (showMovementColoring) {
+            clearGridClicks();
 
-        for (int i=0; i<gridList.GetLength(0); i++) {
-            for (int j=0; j<gridList.GetLength(1); j++) {
-                gridList[i,j].GetComponent<HexMesh>().setClicked(false);
+            for (int i=0; i<gridList.GetLength(0); i++) {
+                for (int j=0; j<gridList.GetLength(1); j++) {
+                    int distance = calculateCubeDistance(gridList[i,j], hexagon);
+
+                    // Color value only if the monster can reach it, and if the component is travable
+                    if (distance <= range && !(gridList[i,j].GetComponent<HexMesh>().hasMonster())) {
+                        gridList[i,j].GetComponent<HexMesh>().toggleColor(new Color(49,49,49));
+                    }
+                }
             }
         }
     }

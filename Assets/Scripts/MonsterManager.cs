@@ -35,7 +35,7 @@ public class MonsterManager : MonoBehaviour {
      * Called when the script is first enabled (will not be run until an object is enabled)
      */
     void Start () {
-        for (int i=0; i<56; i++) {
+        for (int i=0; i<3; i++) {
             spawnMonster("RANDOM"+i);
         }
         // spawnMonster("Tim");
