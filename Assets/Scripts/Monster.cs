@@ -50,6 +50,11 @@ public class Monster : MonoBehaviour, IPointerClickHandler {
     protected int movementAmount;
 
     /**
+     * How far a monster is allowed to attack
+     */
+    protected int attackRange;
+
+    /**
      * How fast the monster when it does move
      */
     float speed;
@@ -72,6 +77,7 @@ public class Monster : MonoBehaviour, IPointerClickHandler {
         
         movementAmount = 5;
         speed = 10;
+        attackRange = 2;
     }
 
     /**
@@ -145,6 +151,14 @@ public class Monster : MonoBehaviour, IPointerClickHandler {
      */
     public int getMovementAmount() {
         return movementAmount;
+    }
+
+    /**
+     * Returns the range for which this monster can attack
+     * @return {[type]} int - The range of attack
+     */
+    public int getAttackRange() {
+        return attackRange;
     }
 
     /**

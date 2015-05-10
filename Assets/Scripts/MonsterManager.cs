@@ -12,7 +12,7 @@ public class MonsterManager : MonoBehaviour {
     /**
      * The hex grid manager within the scene
      */
-    public GameObject hexGridManager;
+    public GameObject hexManagerObject;
 
     /**
      * The Monster display 
@@ -25,10 +25,15 @@ public class MonsterManager : MonoBehaviour {
     private GameObject selectedMonster;
 
     /**
+     * The script attached to the hexManagerObject
+     */
+    private HexGridManager hexGridManager;
+
+    /**
      * Called when the script is being loaded 
      */
     void Awake () {
-        
+        hexGridManager = hexManagerObject.GetComponent<HexGridManager>();
     }
 
     /**
@@ -38,11 +43,6 @@ public class MonsterManager : MonoBehaviour {
         for (int i=0; i<3; i++) {
             spawnMonster("RANDOM"+i);
         }
-        // spawnMonster("Tim");
-        // spawnMonster("George");
-        // spawnMonster("BOB");
-
-        // monsterCreated.transform.position = 
     }
 
     /**
@@ -76,7 +76,19 @@ public class MonsterManager : MonoBehaviour {
                 selectedMonster = monster;
                 break;
             case Mouse.State.Attack:
-                Debug.Log("WE ARE TRYING TO ATTACK " + monster.name);
+                if (monster != selectedMonster) {
+                    GameObject selectedTile = selectedMonster.GetComponent<Monster>().getTilePosition();
+                    GameObject clickedTile = monster.GetComponent<Monster>().getTilePosition();
+                    int distance = hexGridManager.calculateCubeDistance(selectedTile, clickedTile);
+                    if (selectedMonster.GetComponent<Monster>().getAttackRange() >= distance) {
+                        Debug.Log("WE ARE TRYING TO ATTACK " + monster.name);
+                    } else {
+                        Debug.Log("TOO FAR TO ATTACK");
+                    }
+                } else {
+                    Debug.Log("Cannot attack self, stupidhead");
+                }
+                Mouse.instance().setCurrentState(Mouse.State.Select);
                 break;
             case Mouse.State.Move:
                 Debug.Log("CANNOT MOVE TO THIS POSITION");
@@ -92,7 +104,7 @@ public class MonsterManager : MonoBehaviour {
         GameObject monsterCreated = (GameObject)Instantiate(monsterTemplate);
         GameObject randomTile = null;
         while (randomTile == null) {
-            randomTile = hexGridManager.GetComponent<HexGridManager>().getRandomTile();
+            randomTile = hexGridManager.getRandomTile();
             if (randomTile.GetComponent<HexMesh>().hasMonster()) {
                 randomTile = null;
             } else {

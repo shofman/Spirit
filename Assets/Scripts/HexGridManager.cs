@@ -126,20 +126,17 @@ public class HexGridManager : MonoBehaviour {
     /**
      * Returns whether the movement is possible between a monster and a tile
      * @param  {[type]}  GameObject monster - The monster that we want to try moving
-     * @param  {[type]}  GameObject tileToMoveTo - The tile we want to move towards
+     * @param  {[type]}  GameObject hexagonToMoveTo - The tile we want to move towards
      * @return {Boolean} - Whether or not the monster can move to the tile
      */
-    private bool isMovementPossible(GameObject monster, GameObject tileToMoveTo) {
+    private bool isMovementPossible(GameObject monster, GameObject hexagonToMoveTo) {
         Monster monsterScript = monster.GetComponent<Monster>();
         GameObject monsterTile = monsterScript.getTilePosition();
-        int distanceBetweenTiles = calculateCubeDistance(monsterTile, tileToMoveTo);
+        int distanceBetweenTiles = calculateCubeDistance(monsterTile, hexagonToMoveTo);
         bool isWithinDistance = monsterScript.getMovementAmount() >= distanceBetweenTiles;
-        Debug.Log(distanceBetweenTiles);
-        Debug.Log(isWithinDistance);
-        if (!tileToMoveTo.GetComponent<HexMesh>().hasMonster() && isWithinDistance) {
+        if (!hexagonToMoveTo.GetComponent<HexMesh>().hasMonster() && isWithinDistance) {
             return true;
         } else {
-            Debug.Log("CANNOT MOVE");
             return false;
         }
     }
