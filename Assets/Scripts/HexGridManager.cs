@@ -8,7 +8,7 @@ public class HexGridManager : MonoBehaviour {
     public GameObject hexGridItem;
 
     // The monster manager within the scene
-    public GameObject monsterManager;
+    public GameObject monsterManagerObject;
 	
     // Contains all the hexagons on the battlefield
     private GameObject[,] gridList;
@@ -25,6 +25,16 @@ public class HexGridManager : MonoBehaviour {
     private bool showMovementColoring = false;
 
     /**
+     * Boolean for whether or not we should display the attack color
+     */
+    private bool showAttackColoring = false;
+
+    /**
+     * The script attached to the monsterManagerObject
+     */
+    private MonsterManager monsterManager;
+
+    /**
      * Dimensions of the grid
      */ 
     private int gridLength = 8;
@@ -37,6 +47,7 @@ public class HexGridManager : MonoBehaviour {
         gridHolder.transform.parent = this.transform;
         gridHolder.name = "GridHolder";
         createGrid(gridHolder);
+        monsterManager = monsterManagerObject.GetComponent<MonsterManager>();
     }
 
     // Use this for initialization
@@ -48,12 +59,33 @@ public class HexGridManager : MonoBehaviour {
 	void Update () {
         if (Mouse.instance().getCurrentState() == Mouse.State.Move) {
             showMovementColoring = true;
-            GameObject currentMonster = monsterManager.GetComponent<MonsterManager>().getSelectedMonster();
+            showAttackColoring = false;
+            GameObject currentMonster = monsterManager.getSelectedMonster();
             GameObject monstersHexagon = currentMonster.GetComponent<Monster>().getTilePosition();
-            colorHexagonsWithinRange(monstersHexagon, currentMonster.GetComponent<Monster>().getMovementAmount());
+            colorHexagonsWithinRange(
+                monstersHexagon, 
+                currentMonster.GetComponent<Monster>().getMovementAmount(),
+                new Color(49,49,49),
+                false
+            );
+        } else if (Mouse.instance().getCurrentState() == Mouse.State.Attack) { 
+            showMovementColoring = false;
+            showAttackColoring = true;
+            GameObject currentMonster = monsterManager.getSelectedMonster();
+            GameObject monstersHexagon = currentMonster.GetComponent<Monster>().getTilePosition();
+            colorHexagonsWithinRange(
+                monstersHexagon, 
+                currentMonster.GetComponent<Monster>().getAttackRange(),
+                Color.blue,
+                true
+            );
+
         } else {
             if (showMovementColoring) {
                 showMovementColoring = false;
+                clearGridClicks();
+            } else if (showAttackColoring) {
+                showAttackColoring = false;
                 clearGridClicks();
             }
         }
@@ -78,7 +110,7 @@ public class HexGridManager : MonoBehaviour {
                 break;
             case Mouse.State.Move:
                 // We are trying to move a monster here, check with monster manager to see if possible
-                GameObject monster = monsterManager.GetComponent<MonsterManager>().getSelectedMonster();
+                GameObject monster = monsterManager.getSelectedMonster();
                 if (monster != null) {
                     if (isMovementPossible(monster, hexagon)) {
                         Monster monsterScript = monster.GetComponent<Monster>();
@@ -156,8 +188,8 @@ public class HexGridManager : MonoBehaviour {
      * @param  {[type]} GameObject hexagon - The starting position for the coloration
      * @param  {[type]} int        range   - The distance we want to color
      */
-    private void colorHexagonsWithinRange(GameObject hexagon, int range) {
-        if (showMovementColoring) {
+    private void colorHexagonsWithinRange(GameObject hexagon, int range, Color c, bool colorAll) {
+        if (showMovementColoring || showAttackColoring) {
             clearGridClicks();
 
             for (int i=0; i<gridList.GetLength(0); i++) {
@@ -165,8 +197,12 @@ public class HexGridManager : MonoBehaviour {
                     int distance = calculateCubeDistance(gridList[i,j], hexagon);
 
                     // Color value only if the monster can reach it, and if the component is travable
-                    if (distance <= range && !(gridList[i,j].GetComponent<HexMesh>().hasMonster())) {
-                        gridList[i,j].GetComponent<HexMesh>().toggleColor(new Color(49,49,49));
+                    if (distance <= range) {
+                        if (colorAll) {
+                            gridList[i,j].GetComponent<HexMesh>().toggleColor(c);
+                        } else if (!gridList[i,j].GetComponent<HexMesh>().hasMonster()) {
+                            gridList[i,j].GetComponent<HexMesh>().toggleColor(c);
+                        }
                     }
                 }
             }
